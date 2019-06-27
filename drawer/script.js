@@ -3,16 +3,20 @@ let
 	ctx 	= canvas.getContext('2d'),
 	click	= false,
 	coords	= [],
-	radius	= 5;
+	radius	= 5,
+	colors	= document.getElementsByClassName('color'),
+	sizes	= document.getElementsByClassName('size');
 
 
 canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.height = window.innerHeight - window.innerHeight / 10;
 
-// here we go
+// Code
 
+
+canvas.addEventListener('focusout' , (e) => ctx.beginPath());
 canvas.addEventListener('mousedown' , (e) => click = true);
-canvas.addEventListener('mouseup' , (e) => {
+document.addEventListener('mouseup' , (e) => {
 	click = false;
 	ctx.beginPath();
 	coords.push('mouseup');
@@ -22,7 +26,7 @@ ctx.lineWidth = radius * 2;
 canvas.addEventListener('mousemove' , (e) => {
 
 	if(click) {
-		coords.push([e.clientX , e.clientY]);
+		coords.push([e.clientX , e.clientY , ctx.fillStyle , ctx.strokeStyle , radius]);
 
 		ctx.lineTo(e.clientX , e.clientY);
 		ctx.stroke();
@@ -57,15 +61,22 @@ function replay() {
 		let crd = coords.shift(),
 			e = {
 				clientX: crd['0'],
-				clientY: crd['1']
+				clientY: crd['1'],
+				strokeColor: crd['2'],
+				fillColor: crd['3'],
+				size: crd['4']
 			};
+
+		ctx.fillStyle = e.fillColor;
+		ctx.strokeStyle = e.strokeColor;
+		ctx.lineWidth = e.size * 2;
 
 
 		ctx.lineTo(e.clientX , e.clientY);
 		ctx.stroke();
 
 		ctx.beginPath();
-		ctx.arc(e.clientX , e.clientY , radius , 0 , Math.PI * 2, false)
+		ctx.arc(e.clientX , e.clientY , e.size , 0 , Math.PI * 2, false)
 		ctx.fill();
 
 		ctx.beginPath();
@@ -98,4 +109,20 @@ document.addEventListener('keydown' , (e) => {
 		clear();
 		console.log('Canvas is clear :)');
 	}
+});
+
+Array.prototype.forEach.call(colors , (elem) => {
+	elem.addEventListener('click' , () => {
+		let attr = elem.getAttribute('data-color');
+		ctx.fillStyle = attr;
+		ctx.strokeStyle = attr;
+	})
+});
+
+Array.prototype.forEach.call(sizes , (elem) => {
+	elem.addEventListener('click' , () => {
+		let attr = elem.getAttribute('data-size');
+		radius = +attr / 2;
+		ctx.lineWidth = radius * 2;
+	})
 });
