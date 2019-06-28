@@ -13,9 +13,13 @@ canvas.height = window.innerHeight - window.innerHeight / 10;
 
 // Code
 
+function check() {
+	click = true;
+}
+
 
 canvas.addEventListener('focusout' , (e) => ctx.beginPath());
-canvas.addEventListener('mousedown' , (e) => click = true);
+canvas.addEventListener('mousedown' , check);
 document.addEventListener('mouseup' , (e) => {
 	click = false;
 	ctx.beginPath();
@@ -50,11 +54,15 @@ function clear() {
 }
 
 function replay() {
+
+	canvas.removeEventListener('mousedown' , check);
+
 	const timer = setInterval(function() {
 		if (!coords.length)
 		{
 			clearInterval(timer);
 			ctx.beginPath();
+			canvas.addEventListener('mousedown' , check);
 			return;
 		}
 
@@ -81,6 +89,8 @@ function replay() {
 
 		ctx.beginPath();
 		ctx.moveTo(e.clientX , e.clientY);
+
+
 	} , 5)
 }
 
